@@ -124,7 +124,7 @@ export async function main(ns) {
         hostname = ns.purchaseServer(hostname, targetRam)
 
         if (hostname) {
-          ns.tprint(`[${localeHHMMSS()}] Bought new server: ${hostname} (${targetRam} GiB)`)
+          ns.tprint(`[${localeHHMMSS()}] Bought new server: ${hostname} (${targetRam} GiB) for ${targetRamCost.toLocaleString("nb-NO", { style: 'currency', currency: 'USD' })}.`)
 
           updateServer(ns, serverMap, hostname)
           didChange = true
@@ -169,7 +169,7 @@ export async function main(ns) {
                 hostname = await ns.purchaseServer(hostname, targetRam)
 
                 if (hostname) {
-                  ns.tprint(`[${localeHHMMSS()}] Upgraded: ${purchasedServers[0]} into server: ${hostname} (${targetRam} GiB) for ${targetRamCost}.`)
+                  ns.tprint(`[${localeHHMMSS()}] Upgraded: ${purchasedServers[0]} into server: ${hostname} (${targetRam} GiB) for ${targetRamCost.toLocaleString("nb-NO", { style: 'currency', currency: 'USD' })}.`)
 
                   updateServer(ns, serverMap, hostname)
                   didChange = true
