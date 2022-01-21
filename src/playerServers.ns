@@ -118,13 +118,13 @@ export async function main(ns) {
 
       targetRam = Math.max(settings.minGbRam, targetRam)
       targetRam = Math.min(targetRam, settings.maxGbRam)
-
-      if (ns.getServerMoneyAvailable('home') * settings.totalMoneyAllocation >= targetRam * settings.gbRamCost) {
+      const targetRamCost = ns.getPurchasedServerCost(targetRam);
+      if (ns.getServerMoneyAvailable('home') * settings.totalMoneyAllocation >= targetRamCost) {
         let hostname = `pserv-${targetRam}-${createUUID()}`
         hostname = ns.purchaseServer(hostname, targetRam)
 
         if (hostname) {
-          ns.tprint(`[${localeHHMMSS()}] Bought new server: ${hostname} (${targetRam} GB)`)
+          ns.tprint(`[${localeHHMMSS()}] Bought new server: ${hostname} (${targetRam} GiB)`)
 
           updateServer(ns, serverMap, hostname)
           didChange = true
@@ -157,9 +157,9 @@ export async function main(ns) {
         while (didChange) {
           didChange = false
           purchasedServers = getPurchasedServers(ns)
-
+          const targetRamCost = ns.getPurchasedServerCost(targetRam);
           if (targetRam > ns.getServerMaxRam(purchasedServers[0])) {
-            if (ns.getServerMoneyAvailable('home') * settings.totalMoneyAllocation >= ns.getPurchasedServerCost(targetRam)) {
+            if (ns.getServerMoneyAvailable('home') * settings.totalMoneyAllocation >= targetRamCost) {
               let hostname = `pserv-${targetRam}-${createUUID()}`
 
               await ns.killall(purchasedServers[0])
@@ -169,7 +169,7 @@ export async function main(ns) {
                 hostname = await ns.purchaseServer(hostname, targetRam)
 
                 if (hostname) {
-                  ns.tprint(`[${localeHHMMSS()}] Upgraded: ${purchasedServers[0]} into server: ${hostname} (${targetRam} GB)`)
+                  ns.tprint(`[${localeHHMMSS()}] Upgraded: ${purchasedServers[0]} into server: ${hostname} (${targetRam} GiB) for ${targetRamCost}.`)
 
                   updateServer(ns, serverMap, hostname)
                   didChange = true
