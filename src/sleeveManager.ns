@@ -1,0 +1,35 @@
+let ns;
+const factions = ["Illuminati", "Daedalus", "The Covenant", "MegaCorp", "Bachman & Associates", "Blade Industries", 
+"Clarke Incorporated", "OmniTek Incorporated", "Four Sigma", "KuaiGong International", "Fulcrum Secret Technologies",
+"BitRunners", "The Black Hand", "Aevum", "Chongqing", "Ishima", "New Tokyo", "Sector-12", "Volhaven",
+"Speakers for the Dead", "The Dark Army", "The Syndicate", "Tetrads", "Slum Snakes", "Netburners", "Tian Di Hui",
+"CyberSec", "Bladeburners", "Church of the Machine God"];
+
+const taskTypes = ["Company"];
+
+function syncAndRecover(sleeveNum){
+    const stats = ns.sleeve.getSleeveStats(sleeveNum);
+    if(stats.sync < 100){
+        ns.sleeve.setToSynchronize(sleeveNum);
+        return true;
+    }
+    if(stats.shock > 0) {
+        ns.sleeve.setToShockRecovery(sleeveNum);
+        return true;
+    }
+    return false;
+}
+
+
+export async function main(gameNameSpace) {
+    ns = gameNameSpace;
+    while(true){
+        let sleeveCount = ns.sleeve.getNumSleeves();
+        for (let index = 0; index < sleeveCount; index++) {
+            let isRecovering = syncAndRecover(index);
+            if(isRecovering){continue;}
+            await ns.sleeve.setToFactionWork(index, 'Sector-12', 'FieldWork');
+        }
+        await ns.sleep(60000);
+    }
+}
