@@ -97,9 +97,10 @@ async function getHackableServers(ns, servers) {
     .filter((hostname) => ns.serverExists(hostname))
     .filter((hostname) => servers[hostname].ports <= playerDetails.portHacks || ns.hasRootAccess(hostname))
     .filter((hostname) => servers[hostname].ram >= 2)
+  const skipNames = ['home', 'hacknet-']
 
   for (const hostname of hackableServers) {
-    if (hostname === 'home') continue;
+    if (skipNames.find(x => hostname.startsWith(x))) continue;
     if (!ns.hasRootAccess(hostname)) {
       hackPrograms.forEach((hackProgram) => {
         if (ns.fileExists(hackProgram, 'home')) {
