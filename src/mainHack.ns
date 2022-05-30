@@ -17,7 +17,7 @@ const settings = {
     weaken: 0.05,
   },
   stanekManagerRam: 7,
-  runStanekManager: true 
+  runStanekManager: false,
 }
 
 function getItem(key) {
@@ -153,7 +153,8 @@ function findTargetServer(ns, serversList, servers, serverExtraData) {
 
 export async function main(ns) {
   ns.tprint(`[${localeHHMMSS()}] Starting mainHack.ns`)
-
+  settings.runStanekManager = ns.stanek.activeFragments().length > 0;
+  ns.tprint(`Charging Stanek's Gift: ${settings.runStanekManager}`);
   let hostname = ns.getHostname()
 
   if (hostname !== 'home') {
