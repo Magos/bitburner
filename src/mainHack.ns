@@ -248,17 +248,7 @@ export async function main(ns) {
       for (let i = 0; i < hackableServers.length; i++) {
         const server = serverMap.servers[hackableServers[i]]
         let ram = server.ram
-        if(settings.runStanekManager && ram > settings.stanekManagerRam){
-          if(server.host === "home"){
-            ram = ns.getServerMaxRam(server.host) - ns.getServerUsedRam(server.host)
-            const threads = Math.max(0,Math.floor(ram / settings.stanekManagerRam));
-            // ns.tprint(`Running stanekManager (${settings.stanekManagerRam}) with ${threads} threads on home (${ram}), for a total of ${threads * settings.stanekManagerRam} memory. `)
-            await ns.exec("stanekManager.js", server.host, threads)
-          }else{
-            await ns.exec("stanekManager.js", server.host, 1)
-            ram -= settings.stanekManagerRam;
-          }
-        }
+        ram = await handleStanek(ram, server, ns)
         let cyclesFittable = Math.max(0, Math.floor(ram / 1.75))
         const cyclesToRun = Math.max(0, Math.min(cyclesFittable, growCycles))
         // ns.tprint(`weaken ${cyclesFittable} cyclesFittable, ${cyclesToRun}, ${growCycles} growCycles, ${weakenCycles} weakenCycles, ${hackCycles} hackCycles.`)
@@ -283,17 +273,7 @@ export async function main(ns) {
       for (let i = 0; i < hackableServers.length; i++) {
         const server = serverMap.servers[hackableServers[i]]
         let ram = server.ram
-        if(settings.runStanekManager && ram > settings.stanekManagerRam){
-          if(server.host === "home"){
-            ram = ns.getServerMaxRam(server.host) - ns.getServerUsedRam(server.host)
-            const threads = Math.max(0,Math.floor(ram / settings.stanekManagerRam));
-            // ns.tprint(`Running stanekManager (${settings.stanekManagerRam}) with ${threads} threads on home (${ram}), for a total of ${threads * settings.stanekManagerRam} memory. `)
-            await ns.exec("stanekManager.js", server.host, threads)
-          }else{
-            await ns.exec("stanekManager.js", server.host, 1)
-            ram -= settings.stanekManagerRam;
-          }
-        }
+        ram = await handleStanek(ram, server, ns)
         let cyclesFittable = Math.max(0, Math.floor(ram / 1.75))
         const cyclesToRun = Math.max(0, Math.min(cyclesFittable, growCycles))
         // ns.tprint(`grow ${cyclesFittable} cyclesFittable, ${cyclesToRun}, ${growCycles} growCycles, ${weakenCycles} weakenCycles, ${hackCycles} hackCycles.`)
@@ -335,17 +315,7 @@ export async function main(ns) {
       for (let i = 0; i < hackableServers.length; i++) {
         const server = serverMap.servers[hackableServers[i]]
         let ram = server.ram
-        if(settings.runStanekManager && ram > settings.stanekManagerRam){
-          if(server.host === "home"){
-            ram = ns.getServerMaxRam(server.host) - ns.getServerUsedRam(server.host)
-            const threads = Math.max(0,Math.floor(ram / settings.stanekManagerRam));
-            // ns.tprint(`Running stanekManager (${settings.stanekManagerRam}) with ${threads} threads on home (${ram}), for a total of ${threads * settings.stanekManagerRam} memory. `)
-            await ns.exec("stanekManager.js", server.host, threads)
-          }else{
-            await ns.exec("stanekManager.js", server.host, 1)
-            ram -= settings.stanekManagerRam;
-          }
-        }
+        ram = await handleStanek(ram, server, ns)
         let cyclesFittable = Math.max(0, Math.floor(ram / 1.7))
         const cyclesToRun = Math.max(0, Math.min(cyclesFittable, hackCycles))
         // ns.tprint(`hack ${cyclesFittable} cyclesFittable, ${cyclesToRun}, ${growCycles} growCycles, ${weakenCycles} weakenCycles, ${hackCycles} hackCycles.`)
@@ -376,4 +346,20 @@ export async function main(ns) {
 
     await ns.sleep(weakenTime + 300)
   }
+}
+
+async function handleStanek(ram, server, ns) {
+  // ns.tprint(`Handling stanek for ${server.host}, ${ram}. `)
+  if (settings.runStanekManager && ram > settings.stanekManagerRam) {
+    if (server.host === "home") {
+      ram = ns.getServerMaxRam(server.host) - ns.getServerUsedRam(server.host)
+      const threads = Math.max(1, Math.floor(ram / settings.stanekManagerRam)) 
+      // ns.tprint(`Running stanekManager (${settings.stanekManagerRam}) with ${threads} threads on home (${ns.getServerMaxRam(server.host)}$ - ${ns.getServerUsedRam(server.host)} = ${ram}), for a total of ${threads * settings.stanekManagerRam} memory. `)
+      await ns.exec("stanekManager.js", server.host, threads)
+    } else {
+      await ns.exec("stanekManager.js", server.host, 1)
+      ram -= settings.stanekManagerRam
+    }
+  }
+  return ram
 }
